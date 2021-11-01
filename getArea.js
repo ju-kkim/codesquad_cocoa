@@ -1,13 +1,18 @@
+let executionSequence = [];
+
 function getArea(shape, a, b, c) {
     switch(shape) {
         case 'circle' : 
             if(b == undefined) {
-                return getCircleArea(a);
+                let area = getCircleArea(a);
+                executionSequence.push('circle');
+                return area
             }else {
                 let sum = 0;
                 for(let i = 1; i <= b; i++){
                     sum += getCircleArea(i);
                 }
+                executionSequence.push('circle');
                 return sum;
             }
             break;
@@ -26,9 +31,15 @@ function getCircleArea(r) {
 }
 function getRectArea(width, height) {
     let rectArea = width * height;
+    executionSequence.push('rect');
     return rectArea
 }
 function getTrapezoidArea(upper, lower, height) {
     let trapezoidArea = (upper + lower) * height / 2;
+    executionSequence.push('trapezoid');
     return trapezoidArea;
+}
+
+function printExecutionSequence() {
+    return executionSequence.join()
 }
