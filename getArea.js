@@ -1,45 +1,47 @@
 let executionSequence = [];
 
 function getArea(shape, a, b, c) {
+    let area = 0;
     switch(shape) {
         case 'circle' : 
-            if(b == undefined) {
-                let area = getCircleArea(a);
-                executionSequence.push('circle', area);
-                return area
-            }else {
-                let sum = 0;
-                for(let i = 1; i <= b; i++){
-                    sum += getCircleArea(i);
-                }
-                executionSequence.push('circle', sum);
-                return sum;
-            }
+            area = getCircleArea(a,b)
             break;
         case 'rect' :
-            return getRectArea(a, b)
+            area = getRectArea(a, b);
             break;
         case 'trapezoid':
-            return getTrapezoidArea (a, b, c);
+            area = getTrapezoidArea (a, b, c);
             break;
     }
+    executionSequence.push(`${shape} ${area}`);
+    return area
 }
 
-function getCircleArea(r) {
-    let circleArea = Math.PI * Math.pow(r,2);
+function getCircle(radius){
+    return Math.PI * Math.pow(radius,2);
+}
+function getCircleArea(r, r2) {
+    let circleArea = 0;
+    if(r2 === undefined) {
+        circleArea = getCircle(r)
+    }else {
+        for(let i = 1; i <= r2; i++){
+        circleArea += getCircle(i)
+        }
+    }
     return circleArea;
 }
+
 function getRectArea(width, height) {
     let rectArea = width * height;
-    executionSequence.push('rect', rectArea);
     return rectArea
 }
+
 function getTrapezoidArea(upper, lower, height) {
     let trapezoidArea = (upper + lower) * height / 2;
-    executionSequence.push('trapezoid', trapezoidArea);
     return trapezoidArea;
 }
 
 function printExecutionSequence() {
-    return executionSequence.join()
+    return executionSequence.join(', ')
 }
