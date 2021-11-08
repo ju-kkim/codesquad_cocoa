@@ -1,56 +1,47 @@
 //hash map(hash table)
 function playList(){}
-// put(String key, String value) 키-값을 추가한다.
-playList.prototype.put = function(key, value) {
-    this[key] = value;
-}
-// remove(String key) 해당 키에 있는 값을 삭제한다.
-playList.prototype.remove = function(key) {
-    delete this[key];
-}
-// containsKey(String) 해당 키가 존재하는지 판단해서 Bool 결과를 리턴한다.
-playList.prototype.containsKey = function(key) {
-    return this.hasOwnProperty(key);
-}
-// get(String) 해당 키와 매치되는 값을 찾아서 리턴한다.
-playList.prototype.get = function(key) {
-    return this[key];
-}
-// isEmpty() 비어있는 맵인지 Bool 결과를 리턴한다.
-playList.prototype.isEmpty = function() {
-    if(Object.keys(this).length === 0){
-        return true;
-    }else {
-        return false;
-    }
-}
-// keys() 전체 키 목록을 [String] 배열로 리턴한다.
-playList.prototype.keys = function() {
-    // for 사용
-    // let keyArray = [];
-    // for(key in this) {
-    //     keyArray.push(key);
-    // }
-    // return keyArray;
-    
-    return Object.keys(this)
-}
-// replace(String key, String value) 키-값으로 기존 값을 대체한다.
-playList.prototype.replace = function(key, value) {
-    this[key] = value
-}
-// size() 전체 아이템 개수를 리턴한다.
-playList.prototype.size = function() {
-    return Object.keys(this).length
-}
-// clear() 전체 맵을 초기화한다.
-playList.prototype.clear = function() {
-    for(key in this) {
-        delete this[key]
+playList.prototype = {
+    put : function(key, value) {
+        this[key] = value;
+    },
+    remove : function(key) {
+        delete this[key];
+    },
+    containsKey : function(key) {
+        return this.hasOwnProperty(key);
+    },
+    get : function(key) {
+        return this[key];
+    },
+    isEmpty : function() {
+        if(Object.keys(this).length === 0){
+            return true;
+        }else {
+            return false;
+        }
+    },
+    keys : function() {
+        // for 사용
+        // let keyArray = [];
+        // for(key in this) {
+        //     keyArray.push(key);
+        // }
+        // return keyArray;
+        return Object.keys(this)
+    },
+    replace : function(key, value) {
+        this[key] = value
+    },
+    size : function() {
+        return Object.keys(this).length
+    },
+    clear : function() {
+        for(key in this) {
+            delete this[key]
+        }
     }
 }
 const myPlayLust = new playList();
-const myPlayLust2 = new playList();
 
 // Test
 myPlayLust.put("BE'O(비오)","문득");
