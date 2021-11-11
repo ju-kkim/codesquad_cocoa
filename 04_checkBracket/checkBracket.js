@@ -1,3 +1,5 @@
+// 문자열로 들어오는 배열 파싱하기
+
 class Stack {
     constructor() {
         this.arr = [];
@@ -17,7 +19,7 @@ const data = "[1,2,[3,4,[5,[6]]]]"
 function run(arr) {
     let bracketStack = new Stack;
     let depthCount = 0;
-    let eleCount = 0;
+    let eleCount = 1;
     for(let item of arr) {
         switch (item) {
             case '[' :
@@ -32,9 +34,8 @@ function run(arr) {
                 }
                 break
             case ',' :
-                break
-            default :
                 eleCount += 1;
+                break
         }
     }
     const errorMsg = checkError(bracketStack);
