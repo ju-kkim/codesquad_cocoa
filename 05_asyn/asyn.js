@@ -21,7 +21,7 @@ function getDeviation(array, average) {
 // 표준 편차 구하기
 function getStandardDeviation(array) {
     const arrAverage = getMean(array);
-    let arrDeviation = getDeviation(array, arrAverage);
+    const arrDeviation = getDeviation(array, arrAverage);
     const standardDeviation = Math.sqrt(getMean(arrDeviation.map(item => item * item))).toFixed(2)
     return standardDeviation
 }
