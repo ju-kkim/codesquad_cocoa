@@ -16,8 +16,8 @@ class TodoModel {
         const addBtn = document.querySelector('.add_btn');
         addBtn.addEventListener('click', this.creatTodo.bind(this));
     }
-    setRepository(toDos) {
-        localStorage.setItem(this.REPOSITORY_NAME, JSON.stringify(toDos))
+    setRepository() {
+        localStorage.setItem(this.REPOSITORY_NAME, JSON.stringify(this.storageList))
     }
     getRepository() {
         const currentStorage = JSON.parse(localStorage.getItem(this.REPOSITORY_NAME));
@@ -46,7 +46,7 @@ class TodoModel {
                 this.storageList = currentStorage;
                 break
         }
-        this.setRepository(this.storageList);
+        this.setRepository();
     }
     createEle(todoInfo) {
         this.item = document.createElement('li');
@@ -83,7 +83,7 @@ class TodoModel {
             status : 'ing'
         }
         this.storageList.push(newTodo)
-        this.setRepository(this.storageList)
+        this.setRepository()
         this.createEle(newTodo);
     }
     deleteTodo(e) {
