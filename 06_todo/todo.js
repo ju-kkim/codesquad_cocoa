@@ -1,95 +1,111 @@
-let toDos = []
-const addBtn = document.querySelector('.add_btn');
-
-class ToDoManager {
+class TodoView {
     constructor() {
-        this.item = this.createEle('li');
-        this.checkBox = this.createEle('input');
-        this.titleBox = this.createEle('p');
-        this.delBtn = this.createEle('button');
+        this.model = new TodoModel(this);        
+    }
+    print(todo) {
+        const toDoList = document.querySelector('.todo_list')
+        toDoList.appendChild(todo);
+    }
+}
 
-        this.checkBox.type = 'checkbox';
-        this.titleBox.classList.add('title');
-        this.delBtn.classList.add('del_btn');
-        this.delBtn.innerText = '❌';
-        
-        this.delBtn.addEventListener('click', this.deleteItem.bind(this));
-        this.checkBox.addEventListener('click', this.changeStatus.bind(this));
+class TodoModel {
+    constructor(view) {
+        this.view = view;
+        this.REPOSITORY_NAME = 'todos';
+        this.storageList = [];
+        const addBtn = document.querySelector('.add_btn');
+        addBtn.addEventListener('click', this.creatTodo.bind(this));
     }
-    createEle(tagName) {
-        return document.createElement(tagName);
+    setRepository(toDos) {
+        localStorage.setItem(this.REPOSITORY_NAME, JSON.stringify(toDos))
     }
-    addItem(title) {
-        const toDoList = document.querySelector('.todo_list');
-        this.titleBox.innerText = title.text;
-        this.item.id = title.id;
+    getRepository() {
+        const currentStorage = JSON.parse(localStorage.getItem(this.REPOSITORY_NAME));
+        if(currentStorage !== null){
+            this.storageList = currentStorage
+            currentStorage.forEach(item => {
+                this.createEle(item)
+                this.checkStatus(item.status)
+            });
+        } 
+    }
+    updateRepository(type , target, status) {
+        const currentStorage = JSON.parse(localStorage.getItem(this.REPOSITORY_NAME));
+        let updateStorage
+        switch(type) {
+            case 'delete' :
+                updateStorage = currentStorage.filter(item => item.id !== JSON.parse(target))
+                this.storageList = updateStorage;
+                break
+            case 'status' :
+                currentStorage.forEach(item => {
+                    if(item.id === JSON.parse(target)){
+                        item.status = status
+                    }
+                })
+                this.storageList = currentStorage;
+                break
+        }
+        this.setRepository(this.storageList);
+    }
+    createEle(todoInfo) {
+        this.item = document.createElement('li');
+        this.check = document.createElement('input');
+        this.title = document.createElement('p');
+        this.deleteBtn = document.createElement('button');
+        this.item.id = todoInfo.id;
+        this.check.type = 'checkbox';
+        this.title.classList.add('title');
+        this.title.innerText = todoInfo.title;
+        this.deleteBtn.classList.add('del_btn');
+        this.deleteBtn.innerText = '❌';
+
+        this.item.append(this.check, this.title, this.deleteBtn);
+        this.view.print(this.item)
+
+        this.deleteBtn.addEventListener('click', this.deleteTodo.bind(this))
+        this.check.addEventListener('click', this.changeStatus.bind(this))
+    }
+    creatTodo(e) {
+        e.preventDefault();
         const errorMsg = document.querySelector('.error_msg');
-        if(this.titleBox.innerText === ''){
+        const input = document.querySelector('.add_input');
+        const inputTodo = input.value;
+        if(inputTodo === ''){
             errorMsg.classList.add('show');
             return
         }
-
         errorMsg.classList.remove('show');
-        this.item.appendChild(this.checkBox);
-        this.item.appendChild(this.titleBox);
-        this.item.appendChild(this.delBtn);
-        toDoList.appendChild(this.item);
-        toDos.push(title)
-        this.saveItem(toDos)
-    }
-    saveItem(toDo) {
-        localStorage.setItem("todos", JSON.stringify(toDo))
-    }
-    deleteItem(event) {
-        const deleteTarget = event.target.parentElement;
-        deleteTarget.remove();
-        toDos = toDos.filter((toDoItem) => toDoItem.id !== parseInt(deleteTarget.id))
-        this.saveItem(toDos)
-    }
-    changeStatus(event) {
-        const checkTarget = event.target;
-        const targetParent = event.target.parentElement;
-        let targetStatus = 'ing';
-        if(checkTarget.checked === true){
-            targetStatus = 'finish'
+        input.value = '';
+        const newTodo = {
+            title : inputTodo,
+            id : Date.now(),
+            status : 'ing'
         }
-        toDos.forEach((toDoItem) => {
-            if(toDoItem.id === parseInt(targetParent.id)){
-                toDoItem.status = targetStatus;
-            }
-        }) 
-        this.saveItem(toDos)
+        this.storageList.push(newTodo)
+        this.setRepository(this.storageList)
+        this.createEle(newTodo);
+    }
+    deleteTodo(e) {
+        e.preventDefault();
+        const targetTodo = e.target.parentElement;
+        targetTodo.remove();
+        this.updateRepository('delete' , targetTodo.id)
+    }
+    changeStatus(e) {
+        const target = e.target;
+        const targetItem = target.parentElement.id;
+        let status = 'ing';
+        target.checked === true ? status = 'finish' : status = 'ing';
+        this.updateRepository('status' , targetItem , status)
     }
     checkStatus(status) {
-        if(status === 'finish'){
-            this.checkBox.click()
-        }
+        status === 'finish' ? this.check.click() : false
     }
 }
 
-function addToDo(event) {
-    event.preventDefault();
-    const toDoAddInput = document.querySelector('.add_input');
-    const toDoInputValue = toDoAddInput.value;
-    const toDoObj = {
-        text : toDoInputValue,
-        id : Date.now(),
-        status : 'ing'
-    }
-    toDoAddInput.value = '';
-    const newTodo = new ToDoManager().addItem(toDoObj)
-    return newTodo
+function startTodo(){
+    const view = new TodoView();
+    view.model.getRepository();
 }
-function getLocalStorage() {
-    const savedToDos = localStorage.getItem('todos');
-    if(savedToDos){
-        const parseToDos = JSON.parse(savedToDos);
-        parseToDos.forEach(element => {
-            const setTodo = new ToDoManager()
-            setTodo.addItem(element)
-            setTodo.checkStatus(element.status)
-        });
-    }
-}
-getLocalStorage();
-addBtn.addEventListener('click', addToDo)
+startTodo();
