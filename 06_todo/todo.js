@@ -13,6 +13,10 @@ class TodoModel {
         this.view = view;
         this.REPOSITORY_NAME = 'todos';
         this.storageList = [];
+        this.init();
+    }
+    init() {
+        this.getRepository();
         const addBtn = document.querySelector('.add_btn');
         addBtn.addEventListener('click', this.creatTodo.bind(this));
     }
@@ -29,12 +33,11 @@ class TodoModel {
             });
         } 
     }
-    updateRepository(type , target, status) {
+    updateRepository(type, target, status) {
         const currentStorage = JSON.parse(localStorage.getItem(this.REPOSITORY_NAME));
-        let updateStorage
         switch(type) {
             case 'delete' :
-                updateStorage = currentStorage.filter(item => item.id !== JSON.parse(target))
+                const updateStorage = currentStorage.filter(({id}) => id !== JSON.parse(target))
                 this.storageList = updateStorage;
                 break
             case 'status' :
@@ -106,6 +109,5 @@ class TodoModel {
 
 function startTodo(){
     const view = new TodoView();
-    view.model.getRepository();
 }
 startTodo();
