@@ -1,0 +1,31 @@
+.drop_menu_wrap {
+    width: 500px;
+    margin: 200px auto;
+    text-align: center;
+}
+.drop_menu_wrap .depth01 {
+    display: block;
+    width: 100%;
+    border: 1px solid #ddd;
+    font-size: 20px;
+    line-height: 50px;
+}
+.drop_menu_wrap .depth01_wrap {
+    position: relative;
+}
+.drop_menu_wrap .depth02_wrap,
+.drop_menu_wrap .depth02_wrap li {
+    transform: scaleY(0);
+    transform-origin: center top;
+    transition: transform .3s;
+}
+.drop_menu_wrap .depth01_wrap.active .depth02_wrap,
+.drop_menu_wrap .depth01_wrap.active .depth02_wrap li {
+    transform: scaleY(1);
+}
+.drop_menu_wrap .depth02_wrap li {
+    margin: 10px 0;
+    font-size: 16px;
+    line-height: 40px;
+    background: antiquewhite;
+}
