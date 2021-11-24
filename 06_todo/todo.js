@@ -33,7 +33,7 @@ class TodoModel {
             });
         } 
     }
-    updateRepository(type, target, status) {
+    updateRepository(type, target, updateContent) {
         const currentStorage = JSON.parse(localStorage.getItem(this.REPOSITORY_NAME));
         switch(type) {
             case 'delete' :
@@ -43,7 +43,15 @@ class TodoModel {
             case 'status' :
                 currentStorage.forEach(item => {
                     if(item.id === JSON.parse(target)){
-                        item.status = status
+                        item.status = updateContent
+                    }
+                })
+                this.storageList = currentStorage;
+                break
+            case 'edit' :
+                currentStorage.forEach(item => {
+                    if(item.id === JSON.parse(target)){
+                        item.title = updateContent
                     }
                 })
                 this.storageList = currentStorage;
@@ -55,19 +63,26 @@ class TodoModel {
         this.item = document.createElement('li');
         this.check = document.createElement('input');
         this.title = document.createElement('p');
+        this.editInput = document.createElement('input');
+        this.editBtn = document.createElement('button');
         this.deleteBtn = document.createElement('button');
         this.item.id = todoInfo.id;
         this.check.type = 'checkbox';
         this.title.classList.add('title');
         this.title.innerText = todoInfo.title;
+        this.editInput.classList.add('edit_input');
+        this.editInput.type = 'text';
+        this.editBtn.classList.add('edit_btn');
+        this.editBtn.innerText = 'edit'
         this.deleteBtn.classList.add('del_btn');
         this.deleteBtn.innerText = '❌';
 
-        this.item.append(this.check, this.title, this.deleteBtn);
+        this.item.append(this.check, this.title, this.editInput, this.editBtn, this.deleteBtn);
         this.view.print(this.item)
 
         this.deleteBtn.addEventListener('click', this.deleteTodo.bind(this))
         this.check.addEventListener('click', this.changeStatus.bind(this))
+        this.editBtn.addEventListener('click', this.editTitle.bind(this))
     }
     creatTodo(e) {
         e.preventDefault();
@@ -104,6 +119,24 @@ class TodoModel {
     }
     checkStatus(status) {
         status === 'finish' ? this.check.click() : false
+    }
+    editTitle(e) {
+        e.preventDefault();
+        const target = e.target.parentElement;
+        const todoTitle = target.querySelector('.title');
+        const editInput = target.querySelector('.edit_input');
+        const curTitle = todoTitle.innerText;
+        target.classList.toggle('edit');
+        if(e.target.innerText === 'edit'){
+            e.target.innerText = 'save';
+            editInput.value = curTitle;
+            editInput.focus();
+            return
+        }else {
+            e.target.innerText = 'edit';
+            todoTitle.innerText = editInput.value;
+            this.updateRepository('edit', target.id, editInput.value);
+        }
     }
 }
 
