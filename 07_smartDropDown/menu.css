@@ -10,9 +10,6 @@
     font-size: 20px;
     line-height: 50px;
 }
-.drop_menu_wrap .depth01_wrap {
-    position: relative;
-}
 .drop_menu_wrap .depth02_wrap,
 .drop_menu_wrap .depth02_wrap li {
     transform: scaleY(0);
