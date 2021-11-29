@@ -68,7 +68,13 @@ class TodoView {
             document.querySelector(`#${itemStatus} .todo_list_box`).insertAdjacentHTML('beforeend', elementTag);
         });
     }
-
+    updateCount(counts) {
+        const todoTables = document.querySelectorAll('.todo_table');
+        todoTables.forEach((table, index) => {
+            const num = table.querySelector('.tt_box .num');
+            num.innerText = counts[index];
+        })
+    }
     showError() {
         this.errorMsg.classList.add('show');
     }
@@ -101,6 +107,14 @@ class TodoContorller {
         this.view.updateTodo(this.model.getTodo());
         this.getListCount();
         this.todoEventHandler();
+    }
+    getListCount() {
+        let countNums = [];
+        const todoLists = document.querySelectorAll('.todo_list_box');
+        todoLists.forEach(list => {
+            countNums.push(list.children.length)
+        })
+        this.view.updateCount(countNums);
     }
 }
 
