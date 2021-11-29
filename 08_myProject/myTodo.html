@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My To do Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <h1 class="main_tt">✔️My Todo Manager</h1>
+        <p class="todo_desc">
+            새로운 todo를 추가하려면 아래 <b>TITLE</b>과 <b>DUE DATE</b>를 입력후 <b>+버튼</b>을 클릭하세요.<br>
+            기존 todo의 <b>TITLE</b>, <b>DATE</b>를 클릭하면 수정 가능합니다.<br>
+            <span class="move">Move</span>, <span class="delete">Delete</span> 버튼으로 todo를 관리하세요
+        </p>
+    </header>
+    <main class="content_wrap">
+        <div class="input_wrapper">
+            <div class="input_box">
+                <label for="title">TITLE</label>
+                <input type="text" placeholder="할 일을 입력해주세요" id="title" class="input_ttl">
+            </div>
+            <div class="input_box">
+                <label for="date">DUE DATE</label>
+                <input type="date" id="date" class="input_date">
+            </div>
+            <button type="button" class="add_btn">+</button>
+            <p class="error_msg">TITLE과 DUE DATE 모두 입력해주세요</p>
+        </div>
+        <div class="todo_wrapper">
+            <div id="todo" class="todo_table">
+                <div class="tt_box">
+                    <h2 class="todo_tt">TODO</h2>
+                    <span class="num">0</span>
+                </div>
+                <ul class="todo_list_box">
+                    
+                </ul>
+            </div>
+            <div id="doing" class="todo_table">
+                <div class="tt_box">
+                    <h2 class="todo_tt">DOING</h2>
+                    <span class="num">0</span>
+                </div>
+                <ul class="todo_list_box">
+                    
+                </ul>
+            </div>
+            <div id="done" class="todo_table">
+                <div class="tt_box">
+                    <h2 class="todo_tt">DONE</h2>
+                    <span class="num">0</span>
+                </div>
+                <ul class="todo_list_box">
+                    
+                </ul>
+            </div>
+        </div>
+    </main>
+    <script src="todo.js"></script>
+</body>
+</html>
