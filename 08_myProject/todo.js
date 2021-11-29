@@ -19,6 +19,13 @@ class TodoModel {
         const todoInfo = new TodoInfo(title, date, itemId);
         this.todoList.push(todoInfo);
     }
+    editTodo(todoId, editKind, editValue) {
+        this.todoList.forEach(todo => {
+            if(todo.id === JSON.parse(todoId)) {
+                todo[editKind] = editValue
+            }
+        })
+    }
 }
 
 class TodoView {
@@ -115,6 +122,48 @@ class TodoContorller {
             countNums.push(list.children.length)
         })
         this.view.updateCount(countNums);
+    }
+    todoEventHandler() {
+        const todoItem = document.querySelectorAll('.list_item');
+        todoItem.forEach(todo => {
+            todo.addEventListener('click',function(event) {
+                const target = event.target;
+                const currentTarget = event.currentTarget;
+                const targetSelector = {
+                    title : currentTarget.querySelector('.item_tt'),
+                    date : currentTarget.querySelector('.item_due_date'),
+                    moveBtn : currentTarget.querySelector('.move_btn'),
+                    deleteBtn : currentTarget.querySelector('.del_btn'),
+                }
+                switch(target) {
+                    case targetSelector.title :
+                        this.edit(currentTarget, targetSelector.title, 'title');
+                        break;
+                    case targetSelector.date :
+                        this.edit(currentTarget, targetSelector.date, 'date');
+                        break;
+                    case targetSelector.moveBtn :
+                        break;
+                    case targetSelector.deleteBtn :
+                        break;
+                }
+            }.bind(this))
+        })
+    }
+    edit(item, target, editKind) {
+        const todoTarget = item.id;
+        const editTarget = target.nextElementSibling;
+        target.classList.add('hide');
+        editTarget.classList.remove('hide');
+        editTarget.focus();
+
+        editTarget.addEventListener('blur', function() {
+            const editValue = editTarget.value;
+            this.model.editTodo(todoTarget, editKind, editValue)
+            target.innerText = editValue;
+            editTarget.classList.add('hide');
+            target.classList.remove('hide');
+        }.bind(this))
     }
 }
 
