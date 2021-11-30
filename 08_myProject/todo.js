@@ -26,6 +26,13 @@ class TodoModel {
             }
         })
     }
+    changeStatus(todoId, status) {
+        this.todoList.forEach(todo => {
+            if(todo.id === JSON.parse(todoId)) {
+                todo.status = status
+            }
+        })
+    }
 }
 
 class TodoView {
@@ -111,6 +118,9 @@ class TodoContorller {
         todoDateInput.value = '';
 
         this.model.addTodo(todoTitle, todoDueDate);
+        this.updateView();
+    }
+    updateView() {
         this.view.updateTodo(this.model.getTodo());
         this.getListCount();
         this.todoEventHandler();
@@ -137,12 +147,13 @@ class TodoContorller {
                 }
                 switch(target) {
                     case targetSelector.title :
-                        this.edit(currentTarget, targetSelector.title, 'title');
+                        this.edit(currentTarget, target, 'title');
                         break;
                     case targetSelector.date :
-                        this.edit(currentTarget, targetSelector.date, 'date');
+                        this.edit(currentTarget, target, 'date');
                         break;
                     case targetSelector.moveBtn :
+                        this.showMoveList(currentTarget);
                         break;
                     case targetSelector.deleteBtn :
                         break;
@@ -164,6 +175,25 @@ class TodoContorller {
             editTarget.classList.add('hide');
             target.classList.remove('hide');
         }.bind(this))
+    }
+    showMoveList(item) {
+        const moveLists = item.querySelector('.move_list');
+        const moveListsItem = moveLists.querySelectorAll('li');
+        const currnetList = item.closest('.todo_table').id
+        moveLists.classList.toggle('show');
+        moveListsItem.forEach(item => {
+            if(item.innerText === currnetList) {
+                item.classList.add('hide');
+            }
+            item.addEventListener('click', this.moveTodo.bind(this))
+        })
+    }
+    moveTodo(event) {
+        const target = event.target;
+        const todoItem = target.closest('.list_item').id;
+        
+        this.model.changeStatus(todoItem, target.innerText);
+        this.updateView();
     }
 }
 
