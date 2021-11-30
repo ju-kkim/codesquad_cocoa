@@ -111,6 +111,8 @@ class TodoContorller {
     init() {
         const addBtn = document.querySelector('.add_btn');
         addBtn.addEventListener('click', this.creatModel.bind(this));
+
+        document.querySelector('.input_date').setAttribute('min', this.getToday());
     }
     creatModel() {
         const todoInput = document.querySelector('.input_ttl');
