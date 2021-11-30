@@ -10,6 +10,8 @@ class TodoInfo {
 class TodoModel {
     constructor() {
         this.todoList = [];
+        this.REPOSITORY_NAME = 'todos';
+        this.getRepository();
     }
     getTodo() {
         return this.todoList;
@@ -18,6 +20,7 @@ class TodoModel {
         const itemId = this.todoList.length === 0 ? 1 : this.todoList[this.todoList.length-1].id + 1;
         const todoInfo = new TodoInfo(title, date, itemId);
         this.todoList.push(todoInfo);
+        this.setRepository();
     }
     editTodo(todoId, editKind, editValue) {
         this.todoList.forEach(todo => {
@@ -25,6 +28,7 @@ class TodoModel {
                 todo[editKind] = editValue
             }
         })
+        this.setRepository();
     }
     changeStatus(todoId, status) {
         this.todoList.forEach(todo => {
@@ -32,6 +36,7 @@ class TodoModel {
                 todo.status = status
             }
         })
+        this.setRepository();
     }
     deleteTodo(todoId) {
         this.todoList = this.todoList.filter(todo => {
@@ -39,6 +44,16 @@ class TodoModel {
                 return todo
             }
         })
+        this.setRepository();
+    }
+    setRepository() {
+        localStorage.setItem(this.REPOSITORY_NAME, JSON.stringify(this.todoList))
+    }
+    getRepository() {
+        const currentStorage = JSON.parse(localStorage.getItem(this.REPOSITORY_NAME));
+        if(currentStorage !== null){
+            this.todoList = currentStorage
+        } 
     }
 }
 
@@ -113,6 +128,7 @@ class TodoContorller {
         addBtn.addEventListener('click', this.creatModel.bind(this));
 
         document.querySelector('.input_date').setAttribute('min', this.getToday());
+        this.updateView();
     }
     creatModel() {
         const todoInput = document.querySelector('.input_ttl');
