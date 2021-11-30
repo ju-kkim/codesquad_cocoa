@@ -130,6 +130,7 @@ class TodoContorller {
     updateView() {
         this.view.updateTodo(this.model.getTodo());
         this.getListCount();
+        this.checkDate();
         this.todoEventHandler();
     }
     getListCount() {
@@ -182,6 +183,8 @@ class TodoContorller {
             target.innerText = editValue;
             editTarget.classList.add('hide');
             target.classList.remove('hide');
+
+            this.checkDate();
         }.bind(this))
     }
     showMoveList(item) {
@@ -206,6 +209,24 @@ class TodoContorller {
     deleteTodo(todo) {
         this.model.deleteTodo(todo.id);
         this.updateView();
+    }
+    checkDate() {
+        const dueDateList = document.querySelectorAll('.item_due_date');
+        const today = this.getToday();
+        dueDateList.forEach(date => {
+            if(date.closest('#done')){
+                return
+            }
+            if(today >= date.innerText) {
+                date.classList.add('finish');
+            }else {
+                date.classList.remove('finish');
+            }
+        })
+    }
+    getToday() {
+        const today = new Date().toISOString().split('T')[0];
+        return today
     }
 }
 
