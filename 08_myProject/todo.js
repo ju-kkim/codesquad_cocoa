@@ -17,9 +17,12 @@ class TodoModel {
         return this.todoList;
     }
     addTodo(title, date) {
-        const itemId = this.todoList.length === 0 ? 1 : this.todoList[this.todoList.length-1].id + 1;
+        const thisTodoList = this.getTodo();
+        const zero = 0;
+        const firstTodoId = 1;
+        const itemId = thisTodoList.length === zero ? firstTodoId : thisTodoList[thisTodoList.length-1].id + 1;
         const todoInfo = new TodoInfo(title, date, itemId);
-        this.todoList.push(todoInfo);
+        thisTodoList.push(todoInfo);
         this.setRepository();
     }
     editTodo(todoId, editKind, editValue) {
