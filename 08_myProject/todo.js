@@ -33,6 +33,13 @@ class TodoModel {
             }
         })
     }
+    deleteTodo(todoId) {
+        this.todoList = this.todoList.filter(todo => {
+            if(todo.id !== JSON.parse(todoId)) {
+                return todo
+            }
+        })
+    }
 }
 
 class TodoView {
@@ -156,6 +163,7 @@ class TodoContorller {
                         this.showMoveList(currentTarget);
                         break;
                     case targetSelector.deleteBtn :
+                        this.deleteTodo(currentTarget);
                         break;
                 }
             }.bind(this))
@@ -193,6 +201,10 @@ class TodoContorller {
         const todoItem = target.closest('.list_item').id;
         
         this.model.changeStatus(todoItem, target.innerText);
+        this.updateView();
+    }
+    deleteTodo(todo) {
+        this.model.deleteTodo(todo.id);
         this.updateView();
     }
 }
