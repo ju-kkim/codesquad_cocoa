@@ -246,7 +246,8 @@ class TodoContorller {
         })
     }
     getToday() {
-        const today = new Date().toISOString().split('T')[0];
+        const offset = new Date().getTimezoneOffset() * 60000;
+        const today = new Date(Date.now() - offset).toISOString().split('T')[0];
         return today
     }
 }
