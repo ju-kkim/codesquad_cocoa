@@ -92,14 +92,6 @@ class TodoView {
                         </div>
                     </div>
                     <div class="btn_box">
-                        <div class="move_box">
-                            <button type="button" class="move_btn">Move</button>
-                            <ul class="move_list">
-                                <li><button type="button">todo</button></li>
-                                <li><button type="button">doing</button></li>
-                                <li><button type="button">done</button></li>
-                            </ul>
-                        </div>
                         <button type="button" class="del_btn">Delete</button>
                     </div>
                 </li>
@@ -119,11 +111,141 @@ class TodoView {
     }
 }
 
+class eventHandler {
+    constructor() {
+        this.isClicked = false;
+        this.targetTodo = undefined;
+        this.initialTodo = undefined;
+        this.moveBox = document.querySelector('#move');
+    }
+    mouseDown(drag, event) {
+        const target = event.target
+        const targetTodo = event.target.closest('.list_item');
+        if(!targetTodo) {
+            return
+        }
+        const targetSelector = {
+            title : targetTodo.querySelector('.item_tt'),
+            date : targetTodo.querySelector('.item_due_date'),
+            deleteBtn : targetTodo.querySelector('.del_btn'),
+        }
+
+        switch(target) {
+            case targetSelector.title :
+                this.edit(targetTodo, target, 'title');
+                break;
+            case targetSelector.date :
+                this.edit(targetTodo, target, 'date');
+                break;
+            case targetSelector.deleteBtn :
+                this.deleteTodo(targetTodo);
+                break;
+            default : 
+                drag.startDrag(drag, targetTodo, event);
+        }
+    }
+    startDrag(drag, targetTodo, event) {
+        const mouseMainBtn = 0;
+        drag.isClicked = true;
+
+        if(event.button !== mouseMainBtn){
+            return
+        }
+    
+        drag.targetTodo = targetTodo.cloneNode(true);
+        drag.initialTodo = targetTodo;
+        drag.initialTodo.classList.add('moving');
+        
+        
+        if(drag.moveBox.childElementCount > 0) {
+            drag.moveBox.replaceChild(drag.targetTodo, drag.moveBox.firstChild)
+        }
+        drag.moveBox.appendChild(drag.targetTodo)
+    
+        const { pageX, pageY } = event;
+        drag.moveBox.style.left =  `${pageX - drag.moveBox.offsetWidth / 2}px`;
+        drag.moveBox.style.top =  `${pageY - drag.moveBox.offsetHeight / 2}px`;
+    }
+    mouseMove(event) {
+        if(!this.isClicked || !this.targetTodo) {
+            return
+        }
+        
+        const { pageX, pageY } = event;
+        this.moveBox.hidden = true;
+        const underPointer = document.elementFromPoint(pageX, pageY);
+        const todoUnderPointer = underPointer.closest('li');
+        const listUnderPointer = underPointer.closest('.todo_table');
+        this.moveBox.hidden = false;
+
+        this.moveBox.style.left =  `${pageX - this.moveBox.offsetWidth / 2}px`;
+        this.moveBox.style.top =  `${pageY - this.moveBox.offsetHeight / 2}px`;
+
+        if(!todoUnderPointer) {
+            if(listUnderPointer) {
+                const targetTodoList = listUnderPointer.querySelector('.todo_list_box');
+                const {top} = targetTodoList.getBoundingClientRect();
+                
+                if(top >= pageY) {
+                    targetTodoList.prepend(this.initialTodo);
+                }else {
+                    targetTodoList.appendChild(this.initialTodo);
+                }
+            }
+            return
+        }
+
+        if(this.isBefore(this.initialTodo, todoUnderPointer)) {
+            todoUnderPointer.parentNode.insertBefore(this.initialTodo, todoUnderPointer);
+        }else if(todoUnderPointer.parentNode) {
+            todoUnderPointer.parentNode.insertBefore(this.initialTodo, todoUnderPointer.nextSibling);
+        }
+    }
+    isBefore(initialTodo, todoUnderPointer) {
+        if(todoUnderPointer.parentNode === initialTodo.parentNode) {
+            for(let current = initialTodo.previousSibling; current; current = current.previousSibling) {
+                if(current === todoUnderPointer){
+                    return true;
+                }
+            }
+        }
+        return false
+    }
+    mouseUp(drag) {
+        if(!drag.isClicked) {
+            return
+        }
+        const moveId = drag.initialTodo.id;
+        const moveStatus = drag.initialTodo.closest('.todo_table').id;
+
+        drag.isClicked = false;
+        if(drag.initialTodo) {
+            drag.initialTodo.classList.remove('moving');
+        }
+        if(drag.targetTodo) {
+            drag.targetTodo.remove();
+        }
+        
+        drag.initialTodo = undefined;
+        drag.targetTodo = undefined;
+        
+        this.model.changeStatus(moveId, moveStatus);
+        this.getListCount();
+        this.checkDate();
+    }
+    mouseLeave(drag) {
+        if(!drag.isClicked){
+            return
+        }
+        drag.mouseUp.call(this, drag);
+    }
+}
 
 class TodoContorller {
     constructor(model, view) {
         this.model = model;
         this.view = view;
+        this.eventer = new eventHandler();
         this.init();
     }
     init() {
@@ -163,33 +285,13 @@ class TodoContorller {
         this.view.updateCount(countNums);
     }
     todoEventHandler() {
-        const todoItem = document.querySelectorAll('.list_item');
-        todoItem.forEach(todo => {
-            todo.addEventListener('click',function(event) {
-                const target = event.target;
-                const currentTarget = event.currentTarget;
-                const targetSelector = {
-                    title : currentTarget.querySelector('.item_tt'),
-                    date : currentTarget.querySelector('.item_due_date'),
-                    moveBtn : currentTarget.querySelector('.move_btn'),
-                    deleteBtn : currentTarget.querySelector('.del_btn'),
-                }
-                switch(target) {
-                    case targetSelector.title :
-                        this.edit(currentTarget, target, 'title');
-                        break;
-                    case targetSelector.date :
-                        this.edit(currentTarget, target, 'date');
-                        break;
-                    case targetSelector.moveBtn :
-                        this.showMoveList(currentTarget);
-                        break;
-                    case targetSelector.deleteBtn :
-                        this.deleteTodo(currentTarget);
-                        break;
-                }
-            }.bind(this))
-        })
+        const eventer = this.eventer;
+        const body = document.querySelector('body');
+
+        body.addEventListener('mousedown', eventer.mouseDown.bind(this, eventer));
+        body.addEventListener('mousemove', eventer.mouseMove.bind(eventer));
+        body.addEventListener('mouseup', eventer.mouseUp.bind(this, eventer));
+        body.addEventListener('mouseleave', eventer.mouseLeave.bind(this, eventer));
     }
     edit(item, target, editKind) {
         const todoTarget = item.id;
@@ -208,25 +310,6 @@ class TodoContorller {
             this.checkDate();
         }.bind(this))
     }
-    showMoveList(item) {
-        const moveLists = item.querySelector('.move_list');
-        const moveListsItem = moveLists.querySelectorAll('li');
-        const currnetList = item.closest('.todo_table').id
-        moveLists.classList.toggle('show');
-        moveListsItem.forEach(item => {
-            if(item.innerText === currnetList) {
-                item.classList.add('hide');
-            }
-            item.addEventListener('click', this.moveTodo.bind(this))
-        })
-    }
-    moveTodo(event) {
-        const target = event.target;
-        const todoItem = target.closest('.list_item').id;
-        
-        this.model.changeStatus(todoItem, target.innerText);
-        this.updateView();
-    }
     deleteTodo(todo) {
         this.model.deleteTodo(todo.id);
         this.updateView();
@@ -236,6 +319,7 @@ class TodoContorller {
         const today = this.getToday();
         dueDateList.forEach(date => {
             if(date.closest('#done')){
+                date.classList.remove('finish');
                 return
             }
             if(today >= date.innerText) {
