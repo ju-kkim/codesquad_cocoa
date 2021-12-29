@@ -132,13 +132,8 @@ class eventHandler {
 
         switch(target) {
             case targetSelector.title :
-                this.edit(targetTodo, target, 'title');
-                break;
             case targetSelector.date :
-                this.edit(targetTodo, target, 'date');
-                break;
             case targetSelector.deleteBtn :
-                this.deleteTodo(targetTodo);
                 break;
             default : 
                 drag.startDrag(drag, targetTodo, event);
@@ -211,27 +206,51 @@ class eventHandler {
         }
         return false
     }
-    mouseUp(drag) {
-        if(!drag.isClicked) {
-            return
+    mouseUp(drag, event) {
+        if(drag.isClicked) {
+            const moveId = drag.initialTodo.id;
+            const moveStatus = drag.initialTodo.closest('.todo_table').id;
+    
+            drag.isClicked = false;
+            if(drag.initialTodo) {
+                drag.initialTodo.classList.remove('moving');
+            }
+            if(drag.targetTodo) {
+                drag.targetTodo.remove();
+            }
+            
+            drag.initialTodo = undefined;
+            drag.targetTodo = undefined;
+            
+            this.model.changeStatus(moveId, moveStatus);
+            this.getListCount();
+            this.checkDate();
+        }else {
+            const target = event.target
+            const targetTodo = event.target.closest('.list_item');
+            if(!targetTodo) {
+                return
+            }
+            const targetSelector = {
+                title : targetTodo.querySelector('.item_tt'),
+                date : targetTodo.querySelector('.item_due_date'),
+                deleteBtn : targetTodo.querySelector('.del_btn'),
+            }
+            
+            switch(target) {
+                case targetSelector.title :
+                    this.edit(targetTodo, target, 'title');
+                    break;
+                case targetSelector.date :
+                    this.edit(targetTodo, target, 'date');
+                    break;
+                case targetSelector.deleteBtn :
+                    this.deleteTodo(targetTodo);
+                    break;
+                default : 
+                    return
+            }
         }
-        const moveId = drag.initialTodo.id;
-        const moveStatus = drag.initialTodo.closest('.todo_table').id;
-
-        drag.isClicked = false;
-        if(drag.initialTodo) {
-            drag.initialTodo.classList.remove('moving');
-        }
-        if(drag.targetTodo) {
-            drag.targetTodo.remove();
-        }
-        
-        drag.initialTodo = undefined;
-        drag.targetTodo = undefined;
-        
-        this.model.changeStatus(moveId, moveStatus);
-        this.getListCount();
-        this.checkDate();
     }
     mouseLeave(drag) {
         if(!drag.isClicked){
